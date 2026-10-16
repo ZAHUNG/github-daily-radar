@@ -1,0 +1,63 @@
+name: GitHub Daily Radar
+
+on:
+  schedule:
+    # 08:00 in Asia/Ho_Chi_Minh (UTC+7)
+    - cron: "0 8 * * *"
+      timezone: "Asia/Ho_Chi_Minh"
+  workflow_dispatch:
+    inputs:
+      force_send:
+        description: "Send even if today's digest was already sent"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-daily-radar
+  cancel-in-progress: false
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Send daily digest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FORCE_SEND: ${{ inputs.force_send || 'false' }}
+        run: python bot.py
+
+      - name: Commit snapshot state
+        run: |
+          if git diff --quiet -- data/state.json; then
+            echo "No state changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/state.json
+          git commit -m "chore: update GitHub Radar snapshot"
+          git push
