@@ -2,12 +2,10 @@ name: GitHub Daily Radar
 
 on:
   schedule:
-    # 12:35 in Asia/Ho_Chi_Minh (UTC+7)
-    - cron: "35 12 * * *"
-      timezone: "Asia/Ho_Chi_Minh"
-    # One-time Telegram delivery test: 14:00 on October 17, 2026 (UTC+7).
-    - cron: "0 14 17 10 *"
-      timezone: "Asia/Ho_Chi_Minh"
+    # 12:35 in Vietnam (05:35 UTC).
+    - cron: "35 5 * * *"
+    # One-time Telegram delivery test: 14:35 Vietnam time on October 17, 2026 (07:35 UTC).
+    - cron: "35 7 17 10 *"
   workflow_dispatch:
     inputs:
       force_send:
@@ -50,13 +48,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          FORCE_SEND: ${{ inputs.force_send || (github.event.schedule == '0 14 17 10 *' && 'true') || 'false' }}
+          FORCE_SEND: ${{ inputs.force_send || (github.event.schedule == '35 7 17 10 *' && 'true') || 'false' }}
         run: python bot.py
 
       - name: Remove one-time test schedule
-        if: github.event.schedule == '0 14 17 10 *'
+        if: github.event.schedule == '35 7 17 10 *'
         run: |
-          sed -i '/# One-time Telegram delivery test: 14:00 on October 17, 2026 (UTC+7)./,+2d' .github/workflows/daily-radar.yml
+          sed -i '/# One-time Telegram delivery test: 14:35 Vietnam time on October 17, 2026 (07:35 UTC)./,+1d' .github/workflows/daily-radar.yml
 
       - name: Commit snapshot state
         run: |
