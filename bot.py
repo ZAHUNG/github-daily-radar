@@ -111,7 +111,7 @@ def fmt(n):
 def make_message(ranked, now, baseline, elapsed_hours):
     lines = [
         "🔥 <b>GITHUB DAILY RADAR — TOP 10</b>",
-        f"📅 {now.strftime('%Y-%m-%d')} · 11:00 Vietnam time",
+        f"📅 {now.strftime('%Y-%m-%d')} · 12:35 Vietnam time",
         "",
     ]
     if baseline:

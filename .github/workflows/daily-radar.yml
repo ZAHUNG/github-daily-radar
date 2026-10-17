@@ -2,8 +2,8 @@ name: GitHub Daily Radar
 
 on:
   schedule:
-    # 11:00 in Asia/Ho_Chi_Minh (UTC+7)
-    - cron: "0 11 * * *"
+    # 12:35 in Asia/Ho_Chi_Minh (UTC+7)
+    - cron: "35 12 * * *"
       timezone: "Asia/Ho_Chi_Minh"
   workflow_dispatch:
     inputs:
