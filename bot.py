@@ -159,7 +159,7 @@ def vietnamese_context(repo):
 def make_message(ranked, now, baseline, elapsed_hours):
     lines = [
         "🔥 <b>GITHUB DAILY RADAR — TOP 10</b>",
-        f"📅 {now.strftime('%Y-%m-%d')} · 14:30 Vietnam time",
+        f"📅 {now.strftime('%Y-%m-%d')} · 15:00 Vietnam time",
         "",
     ]
     if baseline:
