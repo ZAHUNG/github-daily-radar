@@ -95,6 +95,7 @@ def discover_repositories(now):
                 "html_url": item.get("html_url", ""),
                 "description": (item.get("description") or "").strip(),
                 "language": item.get("language") or "Not specified",
+                "topics": item.get("topics") or [],
                 "stargazers_count": int(item.get("stargazers_count") or 0),
             }
     return list(found.values())
@@ -106,6 +107,53 @@ def esc(value):
 
 def fmt(n):
     return f"{n:,}"
+
+
+def vietnamese_context(repo):
+    """Return a short Vietnamese explanation derived from GitHub metadata."""
+    context = " ".join(
+        [repo.get("description", ""), repo.get("language", ""), *repo.get("topics", [])]
+    ).lower()
+
+    categories = [
+        (
+            ("ai", "llm", "machine learning", "deep learning", "agent", "model", "gpt"),
+            "Công cụ hoặc thư viện trí tuệ nhân tạo.",
+            "Giúp xây dựng, tích hợp hoặc tự động hóa tác vụ bằng AI.",
+        ),
+        (
+            ("security", "cyber", "vulnerability", "authentication", "privacy", "encryption"),
+            "Công cụ an ninh và bảo mật phần mềm.",
+            "Giúp phát hiện, giảm thiểu hoặc quản lý rủi ro bảo mật.",
+        ),
+        (
+            ("data", "database", "analytics", "etl", "sql", "vector"),
+            "Công cụ làm việc với dữ liệu.",
+            "Giúp thu thập, xử lý, tìm kiếm hoặc phân tích dữ liệu hiệu quả hơn.",
+        ),
+        (
+            ("devops", "docker", "kubernetes", "deployment", "ci/cd", "infrastructure"),
+            "Công cụ hạ tầng và vận hành phần mềm.",
+            "Giúp triển khai, quản lý hoặc tự động hóa hệ thống đáng tin cậy hơn.",
+        ),
+        (
+            ("web", "frontend", "backend", "react", "next.js", "api", "browser"),
+            "Công cụ hoặc thư viện phát triển ứng dụng web.",
+            "Giúp xây dựng giao diện, dịch vụ hoặc tích hợp web nhanh hơn.",
+        ),
+        (
+            ("cli", "developer-tools", "tooling", "debug", "test", "linter", "editor"),
+            "Công cụ hỗ trợ lập trình viên.",
+            "Giúp tự động hóa, kiểm thử hoặc đơn giản hóa quy trình phát triển.",
+        ),
+    ]
+    for keywords, kind, problem in categories:
+        if any(keyword in context for keyword in keywords):
+            return kind, problem
+    return (
+        "Dự án mã nguồn mở dành cho cộng đồng phát triển phần mềm.",
+        "Mục tiêu cụ thể được tác giả mô tả bên dưới; hãy mở repo để xem cách áp dụng.",
+    )
 
 
 def make_message(ranked, now, baseline, elapsed_hours):
@@ -137,12 +185,15 @@ def make_message(ranked, now, baseline, elapsed_hours):
         else:
             growth = f"{fmt(delta)} stars"
         desc = esc(repo["description"] or "No description provided.")
-        if len(desc) > 180:
-            desc = desc[:177].rstrip() + "..."
+        if len(desc) > 100:
+            desc = desc[:97].rstrip() + "..."
+        kind, problem = vietnamese_context(repo)
         lines += [
             f'<b>{i}. <a href="{esc(repo["html_url"])}">{esc(repo["full_name"])}</a></b>',
             f'⭐ {fmt(repo["stargazers_count"])} total · 📈 {esc(growth)} · 💻 {esc(repo["language"])}',
             desc,
+            f"🇻🇳 <b>Đây là gì?</b> {esc(kind)}",
+            f"🎯 <b>Giải quyết:</b> {esc(problem)}",
             "",
         ]
     lines += [
