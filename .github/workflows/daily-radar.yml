@@ -5,6 +5,9 @@ on:
     # 12:35 in Asia/Ho_Chi_Minh (UTC+7)
     - cron: "35 12 * * *"
       timezone: "Asia/Ho_Chi_Minh"
+    # One-time Telegram delivery test: 12:50 on October 17, 2026 (UTC+7).
+    - cron: "50 12 17 10 *"
+      timezone: "Asia/Ho_Chi_Minh"
   workflow_dispatch:
     inputs:
       force_send:
@@ -47,8 +50,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          FORCE_SEND: ${{ inputs.force_send || 'false' }}
+          FORCE_SEND: ${{ inputs.force_send || (github.event.schedule == '50 12 17 10 *' && 'true') || 'false' }}
         run: python bot.py
+
+      - name: Remove one-time test schedule
+        if: github.event.schedule == '50 12 17 10 *'
+        run: sed -i '/# One-time Telegram delivery test: 12:50 on October 17, 2026 (UTC+7)./,+2d' .github/workflows/daily-radar.yml
 
       - name: Commit snapshot state
         run: |
@@ -58,6 +65,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/state.json
+          git add data/state.json .github/workflows/daily-radar.yml
           git commit -m "chore: update GitHub Radar snapshot"
           git push
