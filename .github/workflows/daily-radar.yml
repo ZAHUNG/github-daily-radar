@@ -4,8 +4,8 @@ on:
   schedule:
     # 14:30 in Vietnam (07:30 UTC).
     - cron: "30 7 * * *"
-    # One-time fallback test: 14:45 Vietnam time on October 17, 2026 (07:45 UTC).
-    - cron: "45 7 17 10 *"
+    # One-time scheduled delivery test: 15:05 Vietnam time on October 17, 2026 (08:05 UTC).
+    - cron: "5 8 17 10 *"
   workflow_dispatch:
     inputs:
       force_send:
@@ -48,13 +48,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          FORCE_SEND: ${{ inputs.force_send || 'false' }}
+          FORCE_SEND: ${{ inputs.force_send || (github.event.schedule == '5 8 17 10 *' && 'true') || 'false' }}
         run: python bot.py
 
-      - name: Remove one-time fallback schedule
-        if: github.event.schedule == '45 7 17 10 *'
+      - name: Remove one-time test schedule
+        if: github.event.schedule == '5 8 17 10 *'
         run: |
-          sed -i '/# One-time fallback test: 14:45 Vietnam time on October 17, 2026 (07:45 UTC)./,+1d' .github/workflows/daily-radar.yml
+          sed -i '/# One-time scheduled delivery test: 15:05 Vietnam time on October 17, 2026 (08:05 UTC)./,+1d' .github/workflows/daily-radar.yml
 
       - name: Commit snapshot state
         run: |
