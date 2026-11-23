@@ -2,8 +2,8 @@ name: GitHub Daily Radar
 
 on:
   schedule:
-    # 17:14 in Vietnam (10:14 UTC).
-    - cron: "14 10 * * *"
+    # 01:14 in Vietnam (18:14 UTC on the previous day).
+    - cron: "14 18 * * *"
   workflow_dispatch:
     inputs:
       force_send:

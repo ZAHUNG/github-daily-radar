@@ -1,6 +1,6 @@
 # GitHub Daily Radar
 
-A free scheduled Telegram digest that discovers public GitHub repositories and sends a Top 10 list daily at 17:14 in `Asia/Ho_Chi_Minh`.
+A free scheduled Telegram digest that discovers public GitHub repositories and sends a Top 10 list daily at 01:14 in `Asia/Ho_Chi_Minh`.
 
 ## Features
 
@@ -32,7 +32,7 @@ GitHub repository search does not provide exact rolling 24-hour star history. Th
 
 ## Schedule
 
-The workflow uses `cron: "14 10 * * *"` in UTC. This targets 17:14 Vietnam time (UTC+7). GitHub may delay scheduled workflows during high load, so delivery is not guaranteed at the exact minute. The message shows the actual Vietnam time when the bot runs.
+The workflow uses `cron: "14 18 * * *"` in UTC. This targets 01:14 Vietnam time (UTC+7). GitHub may delay scheduled workflows during high load, so delivery is not guaranteed at the exact minute. The message shows the actual Vietnam time when the bot runs.
 
 ## Duplicate prevention
 
